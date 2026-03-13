@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Stock Chart - Stox</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        body {
+            display: flex;
+            flex-direction: column;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        /* Navigation Bar */
+        .navbar {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding: 0.8rem 2rem;
+            flex-shrink: 0;
+        }
+        
+        .nav-container {
+            max-width: 100%;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff 0%, #a8b8ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+        
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+        }
+        
+        .nav-links a:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        /* Main Controls */
+        .controls {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            flex-shrink: 0;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        button {
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        button:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+        
+        .nav-btn {
+            background: rgba(255,255,255,0.15);
+        }
+        
+        #symbolDisplay {
+            color: white;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-left: 1rem;
+            padding-left: 1rem;
+            border-left: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .exchange-badge {
+            background: rgba(255,215,0,0.2);
+            color: #FFD700;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .timeframe-info {
+            color: rgba(255,255,255,0.7);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .chart-controls {
+            display: flex;
+            gap: 0.5rem;
+            margin-left: auto;
+        }
+        
+        .chart-type-btn {
+            padding: 0.5rem 1rem;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .chart-type-btn.active {
+            background: #FFD700;
+            color: #000;
+            border-color: #FFD700;
+        }
+        
+        .delete-btn {
+            background: rgba(244, 67, 54, 0.2);
+            border-color: rgba(244, 67, 54, 0.3);
+        }
+        
+        .delete-btn:hover {
+            background: rgba(244, 67, 54, 0.4);
+        }
+        
+        .back-btn {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        /* Chart Container */
+        #tvchart {
+            flex: 1;
+            width: 100%;
+            min-height: 0;
+            background: #0b0f1a;
+        }
+        
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(5px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .loading-overlay.active {
+            display: flex;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #FFD700;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            color: white;
+            font-size: 1.2rem;
+        }
+        
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            border-left: 4px solid #4caf50;
+            transform: translateY(200%);
+            transition: transform 0.3s;
+            z-index: 1001;
+        }
+        
+        .toast.show {
+            transform: translateY(0);
+        }
+        
+        .toast.error {
+            border-left-color: #f44336;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .controls {
+                flex-wrap: wrap;
+                padding: 1rem;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            #symbolDisplay {
+                margin-left: 0;
+                padding-left: 0;
+                border-left: none;
+            }
+            
+            .chart-controls {
+                margin-left: 0;
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+    <!-- Load TradingView library -->
+    <script src="https://s3.tradingview.com/tv.js"></script>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">Stox</a>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="dashboard.html">Dashboard</a>
+                <a href="#">Charts</a>
+                <a href="#">Screens</a>
+                <a href="#">Scans</a>
+                <a href="#">Watchlists</a>
+            </div>
+            <div class="user-profile">
+                <span>Trader</span>
+                <div class="avatar">T</div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Chart Controls -->
+    <div class="controls">
+        <div class="nav-buttons">
+            <button class="nav-btn" onclick="prevStock()" title="Previous Stock">← Prev</button>
+            <button class="nav-btn" onclick="nextStock()" title="Next Stock">Next →</button>
+        </div>
+        
+        <span id="symbolDisplay">Loading...</span>
+        <span id="exchangeDisplay" class="exchange-badge">NSE</span>
+        
+        <div class="timeframe-info">
+            <span>📅 1 Year</span>
+        </div>
+        
+        <div class="chart-controls">
+            <button id="candleBtn" class="chart-type-btn" onclick="changeChartType('candle')">Candlestick</button>
+            <button id="lineBtn" class="chart-type-btn active" onclick="changeChartType('line')">Line</button>
+        </div>
+        
+        <button class="delete-btn" onclick="deleteCurrentStock()" title="Remove from watchlist">🗑️ Remove</button>
+        <button class="back-btn" onclick="window.location.href='dashboard.html'">← Dashboard</button>
+    </div>
+    
+    <!-- Chart Container -->
+    <div id="tvchart"></div>
+    
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner"></div>
+        <div class="loading-text">Loading chart data...</div>
+    </div>
+    
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <script>
+        // ==================== CONFIGURATION ====================
+        const urlParams = new URLSearchParams(window.location.search);
+        let currentSymbol = urlParams.get('symbol') || 'RELIANCE';
+        let currentIndex = urlParams.get('index') || '0';
+        let watchlist = [];
+        let tvWidget = null;
+        
+        // BSE listed stocks (for exchange detection)
+        const bseStocks = [
+            'MUTHOOTFIN', 'PAGEIND', 'JUBLFOOD', 'PEL', 'MOTHERSON', 
+            'NAUKRI', 'IDEA', 'GODREJPROP', 'BAJAJELEC', 'BHARATFORG',
+            'CONCOR', 'CUMMINSIND', 'DLF', 'HAVELLS', 'ICICIPRULI',
+            'INDIGO', 'LUPIN', 'MARICO', 'SIEMENS', 'SRTRANSFIN',
+            'TORNTPHARM', 'UBL', 'PIDILITIND', 'COLPAL', 'BERGEPAINT'
+        ];
+        
+        // ==================== INITIALIZATION ====================
+        function initialize() {
+            // Show loading overlay
+            document.getElementById('loadingOverlay').classList.add('active');
+            
+            // Load watchlist from localStorage
+            loadWatchlist();
+            
+            // Clean symbol
+            currentSymbol = cleanSymbol(currentSymbol);
+            
+            // Determine exchange
+            const exchange = determineExchange(currentSymbol);
+            const tradingViewSymbol = exchange === 'NSE' ? `NSE:${currentSymbol}` : `BSE:${currentSymbol}`;
+            
+            // Update UI
+            document.getElementById('symbolDisplay').textContent = currentSymbol;
+            document.getElementById('exchangeDisplay').textContent = exchange;
+            
+            // Create TradingView widget
+            createChart(tradingViewSymbol);
+        }
+        
+        // Load watchlist from localStorage
+        function loadWatchlist() {
+            const saved = localStorage.getItem('watchlists');
+            if (saved) {
+                const watchlists = JSON.parse(saved);
+                // Flatten all stocks from all watchlists for navigation
+                watchlist = watchlists.reduce((acc, w) => [...acc, ...w.stocks], []);
+                // Remove duplicates
+                watchlist = [...new Set(watchlist)];
+            }
+            
+            // If no watchlist, use default
+            if (watchlist.length === 0) {
+                watchlist = [
+                    'RELIANCE', 'TCS', 'HDFCBANK', 'INFY', 'ICICIBANK',
+                    'HINDUNILVR', 'ITC', 'SBIN', 'BHARTIARTL', 'KOTAKBANK'
+                ];
+            }
+            
+            // Find current index
+            currentIndex = watchlist.indexOf(currentSymbol);
+            if (currentIndex === -1) {
+                currentIndex = 0;
+                currentSymbol = watchlist[0];
+            }
+        }
+        
+        // Clean symbol (remove exchange prefixes)
+        function cleanSymbol(symbol) {
+            return symbol.replace('NSE:', '').replace('BSE:', '').replace('.NS', '').replace('.BO', '');
+        }
+        
+        // Determine exchange (NSE or BSE)
+        function determineExchange(symbol) {
+            return bseStocks.includes(symbol) ? 'BSE' : 'NSE';
+        }
+        
+        // Create TradingView chart
+        function createChart(symbol) {
+            tvWidget = new TradingView.widget({
+                "container_id": "tvchart",
+                "width": "100%",
+                "height": "100%",
+                "symbol": symbol,
+                "interval": "1D",
+                "timezone": "Asia/Kolkata",
+                "theme": "dark",
+                "style": "2",  // 2 = Line chart (default)
+                "locale": "en",
+                "toolbar_bg": "#131722",
+                "enable_publishing": false,
+                "hide_top_toolbar": false,
+                "save_image": false,
+                "studies": ["Volume@tv-basicstudies"],
+                "show_popup_button": true,
+                "withdateranges": true,
+                "autosize": true,
+                "range": "12M",  // 1 year default
+                "loading_screen": {
+                    "backgroundColor": "#0b0f1a",
+                    "foregroundColor": "#2962ff"
+                }
+            });
+            
+            // Hide loading overlay when chart is ready
+            tvWidget.onChartReady(() => {
+                document.getElementById('loadingOverlay').classList.remove('active');
+                showToast('Chart loaded successfully', 'success');
+            });
+        }
+        
+        // ==================== NAVIGATION FUNCTIONS ====================
+        function prevStock() {
+            let i = parseInt(currentIndex);
+            i--;
+            if (i < 0) i = watchlist.length - 1;
+            navigateToStock(watchlist[i], i);
+        }
+        
+        function nextStock() {
+            let i = parseInt(currentIndex);
+            i++;
+            if (i >= watchlist.length) i = 0;
+            navigateToStock(watchlist[i], i);
+        }
+        
+        function navigateToStock(symbol, index) {
+            // Show loading overlay
+            document.getElementById('loadingOverlay').classList.add('active');
+            
+            // Navigate to new stock
+            window.location.href = `chart.html?symbol=${symbol}&index=${index}`;
+        }
+        
+        // ==================== CHART TYPE FUNCTIONS ====================
+        function changeChartType(type) {
+            if (!tvWidget) return;
+            
+            if (type === 'candle') {
+                tvWidget.chart().setChartType(1); // 1 = Candlestick
+                document.getElementById('candleBtn').classList.add('active');
+                document.getElementById('lineBtn').classList.remove('active');
+                showToast('Switched to Candlestick chart', 'success');
+            } else {
+                tvWidget.chart().setChartType(2); // 2 = Line
+                document.getElementById('lineBtn').classList.add('active');
+                document.getElementById('candleBtn').classList.remove('active');
+                showToast('Switched to Line chart', 'success');
+            }
+        }
+        
+        // ==================== WATCHLIST MANAGEMENT ====================
+        function deleteCurrentStock() {
+            if (confirm(`Remove ${currentSymbol} from all watchlists?`)) {
+                // Get all watchlists
+                const watchlists = JSON.parse(localStorage.getItem('watchlists')) || [];
+                
+                // Remove current symbol from all watchlists
+                const updatedWatchlists = watchlists.map(w => ({
+                    ...w,
+                    stocks: w.stocks.filter(s => s !== currentSymbol)
+                })).filter(w => w.stocks.length > 0); // Remove empty watchlists
+                
+                // Save back to localStorage
+                localStorage.setItem('watchlists', JSON.stringify(updatedWatchlists));
+                
+                // Update local watchlist array
+                watchlist = watchlist.filter(s => s !== currentSymbol);
+                
+                showToast(`${currentSymbol} removed from watchlists`, 'success');
+                
+                // Navigate to next stock or back to dashboard
+                if (watchlist.length === 0) {
+                    window.location.href = 'dashboard.html';
+                } else {
+                    // Go to next stock or previous if this was the last
+                    let newIndex = currentIndex;
+                    if (newIndex >= watchlist.length) newIndex = watchlist.length - 1;
+                    navigateToStock(watchlist[newIndex], newIndex);
+                }
+            }
+        }
+        
+        // ==================== UTILITY FUNCTIONS ====================
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast ' + (type === 'error' ? 'error' : '');
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+        
+        // ==================== KEYBOARD SHORTCUTS ====================
+        document.addEventListener('keydown', (e) => {
+            // Left arrow for previous
+            if (e.key === 'ArrowLeft') {
+                prevStock();
+            }
+            // Right arrow for next
+            else if (e.key === 'ArrowRight') {
+                nextStock();
+            }
+            // 'L' key for line chart
+            else if (e.key === 'l' || e.key === 'L') {
+                changeChartType('line');
+            }
+            // 'C' key for candlestick
+            else if (e.key === 'c' || e.key === 'C') {
+                changeChartType('candle');
+            }
+            // 'D' key for delete
+            else if (e.key === 'd' || e.key === 'D') {
+                if (e.ctrlKey || e.metaKey) {
+                    e.preventDefault();
+                    deleteCurrentStock();
+                }
+            }
+        });
+        
+        // ==================== ERROR HANDLING ====================
+        window.addEventListener('error', (e) => {
+            console.error('Chart error:', e);
+            document.getElementById('loadingOverlay').classList.remove('active');
+            showToast('Error loading chart. Please try again.', 'error');
+        });
+        
+        // ==================== START APPLICATION ====================
+        document.addEventListener('DOMContentLoaded', initialize);
+        
+        // ==================== EXPORT FUNCTIONS ====================
+        window.prevStock = prevStock;
+        window.nextStock = nextStock;
+        window.changeChartType = changeChartType;
+        window.deleteCurrentStock = deleteCurrentStock;
+    </script>
+</body>
+</html>
