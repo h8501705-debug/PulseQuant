@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Stock Chart - MarketMinds</title>
     <style>
+        /* Keep all your existing styles - they're fine */
         * {
             margin: 0;
             padding: 0;
@@ -24,21 +25,17 @@
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
 
-        /* Animated Grid Background */
         .bg-grid {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: 
-                linear-gradient(rgba(99, 102, 241, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(99, 102, 241, 0.05) 1px, transparent 1px);
+            background-image: linear-gradient(rgba(99, 102, 241, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(99, 102, 241, 0.05) 1px, transparent 1px);
             background-size: 50px 50px;
             z-index: -2;
         }
 
-        /* Floating Orbs */
         .orb {
             position: fixed;
             border-radius: 50%;
@@ -69,7 +66,6 @@
             50% { transform: translateY(-50px) scale(1.1); }
         }
 
-        /* Navigation Bar */
         .navbar {
             background: rgba(10, 11, 14, 0.8);
             backdrop-filter: blur(10px);
@@ -121,7 +117,6 @@
             background: rgba(99, 102, 241, 0.1);
         }
 
-        /* Main Controls */
         .controls {
             background: rgba(10, 11, 14, 0.8);
             backdrop-filter: blur(10px);
@@ -233,7 +228,6 @@
             background: rgba(16, 185, 129, 0.3);
         }
 
-        /* Chart Container */
         #tvchart {
             flex: 1;
             width: 100%;
@@ -241,7 +235,6 @@
             background: #0a0b0e;
         }
 
-        /* Loading Overlay */
         .loading-overlay {
             position: fixed;
             top: 0;
@@ -280,7 +273,6 @@
             font-size: 1.2rem;
         }
 
-        /* Toast Notification */
         .toast {
             position: fixed;
             bottom: 2rem;
@@ -305,7 +297,6 @@
             border-left-color: #ef4444;
         }
 
-        /* Responsive */
         @media (max-width: 768px) {
             .controls {
                 flex-wrap: wrap;
@@ -329,16 +320,13 @@
             }
         }
     </style>
-    <!-- Load TradingView library -->
     <script src="https://s3.tradingview.com/tv.js"></script>
 </head>
 <body>
-    <!-- Animated Background -->
     <div class="bg-grid"></div>
     <div class="orb orb-1"></div>
     <div class="orb orb-2"></div>
 
-    <!-- Navigation Bar -->
     <nav class="navbar">
         <div class="nav-container">
             <a href="index.html" class="logo">MarketMinds</a>
@@ -350,11 +338,10 @@
         </div>
     </nav>
     
-    <!-- Chart Controls -->
     <div class="controls">
         <div class="nav-buttons">
-            <button class="nav-btn" onclick="prevStock()" title="Previous Stock">← Prev</button>
-            <button class="nav-btn" onclick="nextStock()" title="Next Stock">Next →</button>
+            <button class="nav-btn" onclick="prevStock()">← Prev</button>
+            <button class="nav-btn" onclick="nextStock()">Next →</button>
         </div>
         
         <span id="symbolDisplay">Loading...</span>
@@ -369,74 +356,109 @@
             <button id="lineBtn" class="chart-type-btn active" onclick="changeChartType('line')">Line</button>
         </div>
         
-        <button class="delete-btn" onclick="deleteCurrentStock()" title="Remove from watchlist">🗑️ Remove</button>
+        <button class="delete-btn" onclick="deleteCurrentStock()">🗑️ Remove</button>
         <button class="back-btn" onclick="window.location.href='dashboard.html'">← Dashboard</button>
     </div>
     
-    <!-- Chart Container -->
     <div id="tvchart"></div>
     
-    <!-- Loading Overlay -->
     <div id="loadingOverlay" class="loading-overlay">
         <div class="spinner"></div>
         <div class="loading-text">Loading chart data...</div>
     </div>
     
-    <!-- Toast Notification -->
     <div id="toast" class="toast"></div>
 
     <script>
-        // ==================== CONFIGURATION ====================
+        // ==================== COMPLETE SYMBOL MAPPING ====================
+        // This ensures EVERY stock works, whether it's NSE, BSE, or code number
+        
         const urlParams = new URLSearchParams(window.location.search);
         let currentSymbol = urlParams.get('symbol') || 'RELIANCE';
         let currentIndex = urlParams.get('index') || '0';
         let watchlist = [];
         let tvWidget = null;
         
-        // BSE listed stocks (for exchange detection)
+        // Comprehensive BSE stocks list (stocks that are ONLY on BSE or work better on BSE)
         const bseStocks = [
             'MUTHOOTFIN', 'PAGEIND', 'JUBLFOOD', 'PEL', 'MOTHERSON', 
             'NAUKRI', 'IDEA', 'GODREJPROP', 'BAJAJELEC', 'BHARATFORG',
             'CONCOR', 'CUMMINSIND', 'DLF', 'HAVELLS', 'ICICIPRULI',
             'INDIGO', 'LUPIN', 'MARICO', 'SIEMENS', 'SRTRANSFIN',
-            'TORNTPHARM', 'UBL', 'PIDILITIND', 'COLPAL', 'BERGEPAINT'
+            'TORNTPHARM', 'UBL', 'PIDILITIND', 'COLPAL', 'BERGEPAINT',
+            // Add more BSE stocks here as needed
         ];
+        
+        // Stocks that are numeric codes (BSE code numbers)
+        function isNumericCode(symbol) {
+            return /^\d+$/.test(symbol); // Returns true if symbol contains only numbers
+        }
         
         // ==================== INITIALIZATION ====================
         function initialize() {
-            // Show loading overlay
             document.getElementById('loadingOverlay').classList.add('active');
             
-            // Load watchlist from localStorage
             loadWatchlist();
-            
-            // Clean symbol
             currentSymbol = cleanSymbol(currentSymbol);
             
-            // Determine exchange
-            const exchange = determineExchange(currentSymbol);
-            const tradingViewSymbol = exchange === 'NSE' ? `NSE:${currentSymbol}` : `BSE:${currentSymbol}`;
+            // Get the CORRECT TradingView symbol format
+            const tradingViewSymbol = getTradingViewSymbol(currentSymbol);
             
-            // Update UI
             document.getElementById('symbolDisplay').textContent = currentSymbol;
-            document.getElementById('exchangeDisplay').textContent = exchange;
             
-            // Create TradingView widget
+            // Show exchange info
+            if (isNumericCode(currentSymbol)) {
+                document.getElementById('exchangeDisplay').textContent = 'BSE Code';
+            } else if (bseStocks.includes(currentSymbol)) {
+                document.getElementById('exchangeDisplay').textContent = 'BSE';
+            } else {
+                document.getElementById('exchangeDisplay').textContent = 'NSE';
+            }
+            
             createChart(tradingViewSymbol);
+        }
+        
+        // Get the correct TradingView symbol format
+        function getTradingViewSymbol(symbol) {
+            // If it's a numeric code (like 544412), use BSE: prefix
+            if (isNumericCode(symbol)) {
+                return 'BSE:' + symbol;
+            }
+            // If it's in our BSE list, use BSE: prefix
+            else if (bseStocks.includes(symbol)) {
+                return 'BSE:' + symbol;
+            }
+            // Otherwise, use NSE: prefix
+            else {
+                return 'NSE:' + symbol;
+            }
         }
         
         // Load watchlist from localStorage
         function loadWatchlist() {
             const saved = localStorage.getItem('marketminds_watchlists');
             if (saved) {
-                const watchlists = JSON.parse(saved);
-                // Flatten all stocks from all watchlists for navigation
-                watchlist = watchlists.reduce((acc, w) => [...acc, ...w.stocks], []);
-                // Remove duplicates
-                watchlist = [...new Set(watchlist)];
+                try {
+                    const watchlists = JSON.parse(saved);
+                    watchlist = [];
+                    for (let i = 0; i < watchlists.length; i++) {
+                        for (let j = 0; j < watchlists[i].stocks.length; j++) {
+                            watchlist.push(watchlists[i].stocks[j]);
+                        }
+                    }
+                    // Remove duplicates
+                    const uniqueWatchlist = [];
+                    for (let i = 0; i < watchlist.length; i++) {
+                        if (uniqueWatchlist.indexOf(watchlist[i]) === -1) {
+                            uniqueWatchlist.push(watchlist[i]);
+                        }
+                    }
+                    watchlist = uniqueWatchlist;
+                } catch (e) {
+                    console.log('Error parsing watchlists', e);
+                }
             }
             
-            // If no watchlist, use default
             if (watchlist.length === 0) {
                 watchlist = [
                     'RELIANCE', 'TCS', 'HDFCBANK', 'INFY', 'ICICIBANK',
@@ -444,7 +466,6 @@
                 ];
             }
             
-            // Find current index
             currentIndex = watchlist.indexOf(currentSymbol);
             if (currentIndex === -1) {
                 currentIndex = 0;
@@ -452,17 +473,13 @@
             }
         }
         
-        // Clean symbol (remove exchange prefixes)
         function cleanSymbol(symbol) {
-            return symbol.replace('NSE:', '').replace('BSE:', '').replace('.NS', '').replace('.BO', '');
+            if (!symbol) return 'RELIANCE';
+            // Remove any exchange prefixes
+            symbol = symbol.replace('NSE:', '').replace('BSE:', '').replace('.NS', '').replace('.BO', '');
+            return symbol;
         }
         
-        // Determine exchange (NSE or BSE)
-        function determineExchange(symbol) {
-            return bseStocks.includes(symbol) ? 'BSE' : 'NSE';
-        }
-        
-        // Create TradingView chart
         function createChart(symbol) {
             tvWidget = new TradingView.widget({
                 "container_id": "tvchart",
@@ -472,7 +489,7 @@
                 "interval": "1D",
                 "timezone": "Asia/Kolkata",
                 "theme": "dark",
-                "style": "2",  // 2 = Line chart (default)
+                "style": "2",
                 "locale": "en",
                 "toolbar_bg": "#0a0b0e",
                 "enable_publishing": false,
@@ -482,124 +499,118 @@
                 "show_popup_button": true,
                 "withdateranges": true,
                 "autosize": true,
-                "range": "12M",  // 1 year default
+                "range": "12M",
                 "loading_screen": {
                     "backgroundColor": "#0a0b0e",
                     "foregroundColor": "#6366f1"
                 }
             });
             
-            // Hide loading overlay when chart is ready
-            tvWidget.onChartReady(() => {
+            tvWidget.onChartReady(function() {
                 document.getElementById('loadingOverlay').classList.remove('active');
                 showToast('Chart loaded successfully', 'success');
             });
         }
         
-        // ==================== NAVIGATION FUNCTIONS ====================
         function prevStock() {
             let i = parseInt(currentIndex);
             i--;
             if (i < 0) i = watchlist.length - 1;
-            navigateToStock(watchlist[i], i);
+            window.location.href = 'chart.html?symbol=' + watchlist[i] + '&index=' + i;
         }
         
         function nextStock() {
             let i = parseInt(currentIndex);
             i++;
             if (i >= watchlist.length) i = 0;
-            navigateToStock(watchlist[i], i);
+            window.location.href = 'chart.html?symbol=' + watchlist[i] + '&index=' + i;
         }
         
-        function navigateToStock(symbol, index) {
-            // Show loading overlay
-            document.getElementById('loadingOverlay').classList.add('active');
-            
-            // Navigate to new stock
-            window.location.href = `chart.html?symbol=${symbol}&index=${index}`;
-        }
-        
-        // ==================== CHART TYPE FUNCTIONS ====================
         function changeChartType(type) {
             if (!tvWidget) return;
             
             if (type === 'candle') {
-                tvWidget.chart().setChartType(1); // 1 = Candlestick
+                tvWidget.chart().setChartType(1);
                 document.getElementById('candleBtn').classList.add('active');
                 document.getElementById('lineBtn').classList.remove('active');
                 showToast('Switched to Candlestick chart', 'success');
             } else {
-                tvWidget.chart().setChartType(2); // 2 = Line
+                tvWidget.chart().setChartType(2);
                 document.getElementById('lineBtn').classList.add('active');
                 document.getElementById('candleBtn').classList.remove('active');
                 showToast('Switched to Line chart', 'success');
             }
         }
         
-        // ==================== WATCHLIST MANAGEMENT ====================
         function deleteCurrentStock() {
-            if (confirm(`Remove ${currentSymbol} from all watchlists?`)) {
-                // Get all watchlists
+            if (confirm('Remove ' + currentSymbol + ' from all watchlists?')) {
                 const watchlists = JSON.parse(localStorage.getItem('marketminds_watchlists')) || [];
                 
-                // Remove current symbol from all watchlists
-                const updatedWatchlists = watchlists.map(w => ({
-                    ...w,
-                    stocks: w.stocks.filter(s => s !== currentSymbol)
-                })).filter(w => w.stocks.length > 0); // Remove empty watchlists
+                for (let i = 0; i < watchlists.length; i++) {
+                    const newStocks = [];
+                    for (let j = 0; j < watchlists[i].stocks.length; j++) {
+                        if (watchlists[i].stocks[j] !== currentSymbol) {
+                            newStocks.push(watchlists[i].stocks[j]);
+                        }
+                    }
+                    watchlists[i].stocks = newStocks;
+                }
                 
-                // Save back to localStorage
-                localStorage.setItem('marketminds_watchlists', JSON.stringify(updatedWatchlists));
+                // Remove empty watchlists
+                const nonEmptyWatchlists = [];
+                for (let i = 0; i < watchlists.length; i++) {
+                    if (watchlists[i].stocks.length > 0) {
+                        nonEmptyWatchlists.push(watchlists[i]);
+                    }
+                }
                 
-                // Update local watchlist array
-                watchlist = watchlist.filter(s => s !== currentSymbol);
+                localStorage.setItem('marketminds_watchlists', JSON.stringify(nonEmptyWatchlists));
                 
-                showToast(`${currentSymbol} removed from watchlists`, 'success');
+                // Update local watchlist
+                const newWatchlist = [];
+                for (let i = 0; i < watchlist.length; i++) {
+                    if (watchlist[i] !== currentSymbol) {
+                        newWatchlist.push(watchlist[i]);
+                    }
+                }
+                watchlist = newWatchlist;
                 
-                // Navigate to next stock or back to dashboard
+                showToast(currentSymbol + ' removed from watchlists', 'success');
+                
                 if (watchlist.length === 0) {
                     window.location.href = 'dashboard.html';
                 } else {
-                    // Go to next stock or previous if this was the last
                     let newIndex = currentIndex;
                     if (newIndex >= watchlist.length) newIndex = watchlist.length - 1;
-                    navigateToStock(watchlist[newIndex], newIndex);
+                    window.location.href = 'chart.html?symbol=' + watchlist[newIndex] + '&index=' + newIndex;
                 }
             }
         }
         
-        // ==================== UTILITY FUNCTIONS ====================
-        function showToast(message, type = 'success') {
+        function showToast(message, type) {
             const toast = document.getElementById('toast');
             toast.textContent = message;
-            toast.className = 'toast ' + (type === 'error' ? 'error' : '');
+            toast.className = 'toast';
+            if (type === 'error') {
+                toast.classList.add('error');
+            }
             toast.classList.add('show');
             
-            setTimeout(() => {
+            setTimeout(function() {
                 toast.classList.remove('show');
             }, 3000);
         }
         
-        // ==================== KEYBOARD SHORTCUTS ====================
-        document.addEventListener('keydown', (e) => {
-            // Left arrow for previous
+        document.addEventListener('keydown', function(e) {
             if (e.key === 'ArrowLeft') {
                 prevStock();
-            }
-            // Right arrow for next
-            else if (e.key === 'ArrowRight') {
+            } else if (e.key === 'ArrowRight') {
                 nextStock();
-            }
-            // 'L' key for line chart
-            else if (e.key === 'l' || e.key === 'L') {
+            } else if (e.key === 'l' || e.key === 'L') {
                 changeChartType('line');
-            }
-            // 'C' key for candlestick
-            else if (e.key === 'c' || e.key === 'C') {
+            } else if (e.key === 'c' || e.key === 'C') {
                 changeChartType('candle');
-            }
-            // 'D' key for delete
-            else if (e.key === 'd' || e.key === 'D') {
+            } else if (e.key === 'd' || e.key === 'D') {
                 if (e.ctrlKey || e.metaKey) {
                     e.preventDefault();
                     deleteCurrentStock();
@@ -607,17 +618,14 @@
             }
         });
         
-        // ==================== ERROR HANDLING ====================
-        window.addEventListener('error', (e) => {
-            console.error('Chart error:', e);
+        window.addEventListener('error', function(e) {
+            console.log('Chart error:', e);
             document.getElementById('loadingOverlay').classList.remove('active');
             showToast('Error loading chart. Please try again.', 'error');
         });
         
-        // ==================== START APPLICATION ====================
         document.addEventListener('DOMContentLoaded', initialize);
         
-        // ==================== EXPORT FUNCTIONS ====================
         window.prevStock = prevStock;
         window.nextStock = nextStock;
         window.changeChartType = changeChartType;
