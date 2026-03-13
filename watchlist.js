@@ -23,8 +23,11 @@ function loadWatchlist() {
     }
     
     document.getElementById('watchlistName').textContent = currentWatchlist.name;
-    document.getElementById('stockCount').textContent = `${currentWatchlist.stocks.length} stocks`;
-    document.getElementById('watchlistMeta').textContent = `Created on ${new Date(currentWatchlist.createdAt).toLocaleDateString()}`;
+    document.getElementById('stockCount').textContent = currentWatchlist.stocks.length + ' stocks';
+    
+    if (currentWatchlist.createdAt) {
+        document.getElementById('watchlistMeta').textContent = 'Created on ' + new Date(currentWatchlist.createdAt).toLocaleDateString();
+    }
     
     filteredStocks = [...currentWatchlist.stocks];
     renderStocks();
@@ -41,28 +44,27 @@ function renderStocks() {
         return;
     }
     
-    // Pagination
     const start = (currentPage - 1) * stocksPerPage;
     const end = start + stocksPerPage;
     const paginatedStocks = filteredStocks.slice(start, end);
     
-    container.innerHTML = paginatedStocks.map((stock, index) => {
-        const globalIndex = start + index + 1;
-        // Demo price data - in real app, this would come from API
+    let html = '';
+    for (let i = 0; i < paginatedStocks.length; i++) {
+        const stock = paginatedStocks[i];
+        const globalIndex = start + i + 1;
         const price = (Math.random() * 1000 + 500).toFixed(2);
         const change = (Math.random() * 10 - 5).toFixed(2);
         const changeClass = parseFloat(change) >= 0 ? 'positive' : '';
         
-        return `
-            <div class="stock-item" onclick="window.location.href='chart.html?symbol=${stock}'">
-                <div class="stock-number">${globalIndex}</div>
-                <div class="stock-symbol">${stock}</div>
-                <div class="stock-price">₹${price}</div>
-                <div class="stock-change ${changeClass}">${change}%</div>
-            </div>
-        `;
-    }).join('');
+        html += '<div class="stock-item" onclick="window.location.href=\'chart.html?symbol=' + stock + '\'">';
+        html += '<div class="stock-number">' + globalIndex + '</div>';
+        html += '<div class="stock-symbol">' + stock + '</div>';
+        html += '<div class="stock-price">₹' + price + '</div>';
+        html += '<div class="stock-change ' + changeClass + '">' + change + '%</div>';
+        html += '</div>';
+    }
     
+    container.innerHTML = html;
     renderPagination();
 }
 
@@ -78,7 +80,8 @@ function renderPagination() {
     
     let buttons = '';
     for (let i = 1; i <= totalPages; i++) {
-        buttons += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+        let activeClass = i === currentPage ? 'active' : '';
+        buttons += '<button class="page-btn ' + activeClass + '" onclick="goToPage(' + i + ')">' + i + '</button>';
     }
     
     container.innerHTML = buttons;
@@ -91,23 +94,36 @@ function goToPage(page) {
 }
 
 // Filter stocks
-document.getElementById('searchInput')?.addEventListener('input', (e) => {
-    const searchText = e.target.value.toUpperCase();
+function filterStocks() {
+    const searchInput = document.getElementById('searchInput');
+    if (!searchInput) return;
+    
+    const searchText = searchInput.value.toUpperCase();
     
     if (!searchText) {
         filteredStocks = [...currentWatchlist.stocks];
     } else {
-        filteredStocks = currentWatchlist.stocks.filter(stock => 
-            stock.toUpperCase().includes(searchText)
-        );
+        filteredStocks = [];
+        for (let i = 0; i < currentWatchlist.stocks.length; i++) {
+            if (currentWatchlist.stocks[i].toUpperCase().includes(searchText)) {
+                filteredStocks.push(currentWatchlist.stocks[i]);
+            }
+        }
     }
     
     currentPage = 1;
     renderStocks();
-});
+}
 
 // Initialize
-document.addEventListener('DOMContentLoaded', loadWatchlist);
+document.addEventListener('DOMContentLoaded', function() {
+    loadWatchlist();
+    
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', filterStocks);
+    }
+});
 
 // Make functions global
 window.goToPage = goToPage;
