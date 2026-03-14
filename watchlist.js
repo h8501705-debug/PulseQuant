@@ -1,5 +1,6 @@
 // ==================== WATCHLIST VIEW LOGIC ====================
 let currentWatchlist = null;
+let currentWatchlistId = null;
 let filteredStocks = [];
 let currentPage = 1;
 const stocksPerPage = 50;
@@ -7,15 +8,15 @@ const stocksPerPage = 50;
 // Load watchlist from URL
 function loadWatchlist() {
     const urlParams = new URLSearchParams(window.location.search);
-    const watchlistId = urlParams.get('id');
+    currentWatchlistId = urlParams.get('id');
     
-    if (!watchlistId) {
+    if (!currentWatchlistId) {
         window.location.href = 'dashboard.html';
         return;
     }
     
-    const watchlists = JSON.parse(localStorage.getItem('marketminds_watchlists')) || [];
-    currentWatchlist = watchlists.find(w => w.id === watchlistId);
+    const watchlists = JSON.parse(localStorage.getItem('pulsequant_watchlists')) || [];
+    currentWatchlist = watchlists.find(w => w.id === currentWatchlistId);
     
     if (!currentWatchlist) {
         window.location.href = 'dashboard.html';
@@ -31,6 +32,50 @@ function loadWatchlist() {
     
     filteredStocks = [...currentWatchlist.stocks];
     renderStocks();
+}
+
+// Delete a single stock from watchlist
+function deleteStockFromWatchlist(symbol, event) {
+    event.stopPropagation(); // Prevent the click from triggering the stock click
+    
+    if (confirm('Remove ' + symbol + ' from this watchlist?')) {
+        // Get current watchlists
+        const watchlists = JSON.parse(localStorage.getItem('pulsequant_watchlists')) || [];
+        
+        // Find and update this watchlist
+        for (let i = 0; i < watchlists.length; i++) {
+            if (watchlists[i].id === currentWatchlistId) {
+                const newStocks = [];
+                for (let j = 0; j < watchlists[i].stocks.length; j++) {
+                    if (watchlists[i].stocks[j] !== symbol) {
+                        newStocks.push(watchlists[i].stocks[j]);
+                    }
+                }
+                watchlists[i].stocks = newStocks;
+                currentWatchlist = watchlists[i];
+                break;
+            }
+        }
+        
+        // Save back to localStorage
+        localStorage.setItem('pulsequant_watchlists', JSON.stringify(watchlists));
+        
+        // Update filtered stocks and re-render
+        filteredStocks = filteredStocks.filter(s => s !== symbol);
+        document.getElementById('stockCount').textContent = currentWatchlist.stocks.length + ' stocks';
+        
+        if (filteredStocks.length === 0) {
+            // If no stocks left, go back to dashboard
+            window.location.href = 'dashboard.html';
+        } else {
+            // Adjust current page if needed
+            const totalPages = Math.ceil(filteredStocks.length / stocksPerPage);
+            if (currentPage > totalPages) {
+                currentPage = totalPages;
+            }
+            renderStocks();
+        }
+    }
 }
 
 // Render stocks with pagination
@@ -56,11 +101,12 @@ function renderStocks() {
         const change = (Math.random() * 10 - 5).toFixed(2);
         const changeClass = parseFloat(change) >= 0 ? 'positive' : '';
         
-        html += '<div class="stock-item" onclick="window.location.href=\'chart.html?symbol=' + stock + '\'">';
+        html += '<div class="stock-item">';
         html += '<div class="stock-number">' + globalIndex + '</div>';
-        html += '<div class="stock-symbol">' + stock + '</div>';
+        html += '<div class="stock-symbol" onclick="window.location.href=\'chart.html?symbol=' + stock + '\'">' + stock + '</div>';
         html += '<div class="stock-price">₹' + price + '</div>';
         html += '<div class="stock-change ' + changeClass + '">' + change + '%</div>';
+        html += '<div><button class="stock-delete-btn" onclick="deleteStockFromWatchlist(\'' + stock + '\', event)">Delete</button></div>';
         html += '</div>';
     }
     
@@ -127,3 +173,4 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Make functions global
 window.goToPage = goToPage;
+window.deleteStockFromWatchlist = deleteStockFromWatchlist;
