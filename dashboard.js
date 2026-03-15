@@ -1,59 +1,132 @@
 // ==================== DASHBOARD LOGIC ====================
 let watchlists = [];
 let currentEditId = null;
+let currentUser = null;
+
+// Check if user is logged in
+function checkLoginStatus() {
+    const savedUser = localStorage.getItem('pulsequant_current_user');
+    if (savedUser) {
+        currentUser = JSON.parse(savedUser);
+        updateUIForLoggedInUser();
+    } else {
+        updateUIForLoggedOutUser();
+    }
+}
+
+// Update UI for logged in user
+function updateUIForLoggedInUser() {
+    document.getElementById('loggedOutView').style.display = 'none';
+    document.getElementById('loggedInView').style.display = 'block';
+    document.getElementById('userEmail').textContent = currentUser.email;
+    document.getElementById('accountInitial').textContent = '👤';
+    document.getElementById('welcomeMessage').textContent = `Welcome back, ${currentUser.email.split('@')[0]}!`;
+}
+
+// Update UI for logged out user
+function updateUIForLoggedOutUser() {
+    document.getElementById('loggedOutView').style.display = 'block';
+    document.getElementById('loggedInView').style.display = 'none';
+    document.getElementById('accountInitial').textContent = '👤';
+    document.getElementById('welcomeMessage').textContent = 'Create and manage your stock watchlists';
+}
+
+// Toggle account dropdown
+function toggleAccountDropdown() {
+    const dropdown = document.getElementById('accountDropdown');
+    dropdown.classList.toggle('show');
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(event) {
+    const dropdown = document.getElementById('accountDropdown');
+    const accountCircle = document.querySelector('.account-circle');
+    
+    if (!accountCircle.contains(event.target) && !dropdown.contains(event.target)) {
+        dropdown.classList.remove('show');
+    }
+});
+
+// Logout function
+function logout() {
+    localStorage.removeItem('pulsequant_current_user');
+    currentUser = null;
+    updateUIForLoggedOutUser();
+    document.getElementById('accountDropdown').classList.remove('show');
+    
+    // Reload default watchlists
+    loadDefaultWatchlists();
+}
+
+// Get storage key based on user
+function getStorageKey() {
+    if (currentUser) {
+        return `pulsequant_watchlists_${currentUser.email}`;
+    } else {
+        return 'pulsequant_watchlists_default';
+    }
+}
+
+// Load default watchlists
+function loadDefaultWatchlists() {
+    watchlists = [
+        {
+            id: '1',
+            name: 'NIFTY 50',
+            stocks: ['RELIANCE', 'TCS', 'HDFCBANK', 'INFY', 'ICICIBANK', 'SBIN', 'BHARTIARTL', 'ITC', 'KOTAKBANK', 'LT'],
+            isDefault: true,
+            createdAt: new Date().toISOString()
+        },
+        {
+            id: '2',
+            name: 'Banking',
+            stocks: ['HDFCBANK', 'ICICIBANK', 'SBIN', 'KOTAKBANK', 'AXISBANK', 'INDUSINDBK', 'BANDHANBNK', 'FEDERALBNK', 'PNB', 'BANKBARODA'],
+            isDefault: false,
+            createdAt: new Date().toISOString()
+        },
+        {
+            id: '3',
+            name: 'IT',
+            stocks: ['TCS', 'INFY', 'WIPRO', 'HCLTECH', 'TECHM', 'LTTS', 'MPHASIS', 'MINDTREE', 'COFORGE', 'PERSISTENT'],
+            isDefault: false,
+            createdAt: new Date().toISOString()
+        },
+        {
+            id: '4',
+            name: 'Pharma',
+            stocks: ['SUNPHARMA', 'DRREDDY', 'CIPLA', 'DIVISLAB', 'BIOCON', 'LUPIN', 'ALKEM', 'TORNTPHARM', 'AUROPHARMA', 'GLENMARK'],
+            isDefault: false,
+            createdAt: new Date().toISOString()
+        },
+        {
+            id: '5',
+            name: 'Auto',
+            stocks: ['TATAMOTORS', 'MARUTI', 'M&M', 'BAJAJ-AUTO', 'EICHERMOT', 'HEROMOTOCO', 'ASHOKLEY', 'TVSMOTOR', 'TATAMOTORS', 'BALKRISIND'],
+            isDefault: false,
+            createdAt: new Date().toISOString()
+        }
+    ];
+    saveWatchlists();
+    renderWatchlists();
+}
 
 // Load watchlists from localStorage
 function loadWatchlists() {
-    const saved = localStorage.getItem('pulsequant_watchlists');
+    const storageKey = getStorageKey();
+    const saved = localStorage.getItem(storageKey);
+    
     if (saved) {
         watchlists = JSON.parse(saved);
     } else {
-        // Create default watchlists
-        watchlists = [
-            {
-                id: '1',
-                name: 'NIFTY 50',
-                stocks: ['RELIANCE', 'TCS', 'HDFCBANK', 'INFY', 'ICICIBANK', 'SBIN', 'BHARTIARTL', 'ITC', 'KOTAKBANK', 'LT'],
-                isDefault: true,
-                createdAt: new Date().toISOString()
-            },
-            {
-                id: '2',
-                name: 'Banking',
-                stocks: ['HDFCBANK', 'ICICIBANK', 'SBIN', 'KOTAKBANK', 'AXISBANK', 'INDUSINDBK', 'BANDHANBNK', 'FEDERALBNK', 'PNB', 'BANKBARODA'],
-                isDefault: false,
-                createdAt: new Date().toISOString()
-            },
-            {
-                id: '3',
-                name: 'IT',
-                stocks: ['TCS', 'INFY', 'WIPRO', 'HCLTECH', 'TECHM', 'LTTS', 'MPHASIS', 'MINDTREE', 'COFORGE', 'PERSISTENT'],
-                isDefault: false,
-                createdAt: new Date().toISOString()
-            },
-            {
-                id: '4',
-                name: 'Pharma',
-                stocks: ['SUNPHARMA', 'DRREDDY', 'CIPLA', 'DIVISLAB', 'BIOCON', 'LUPIN', 'ALKEM', 'TORNTPHARM', 'AUROPHARMA', 'GLENMARK'],
-                isDefault: false,
-                createdAt: new Date().toISOString()
-            },
-            {
-                id: '5',
-                name: 'Auto',
-                stocks: ['TATAMOTORS', 'MARUTI', 'M&M', 'BAJAJ-AUTO', 'EICHERMOT', 'HEROMOTOCO', 'ASHOKLEY', 'TVSMOTOR', 'TATAMOTORS', 'BALKRISIND'],
-                isDefault: false,
-                createdAt: new Date().toISOString()
-            }
-        ];
-        saveWatchlists();
+        loadDefaultWatchlists();
     }
     renderWatchlists();
 }
 
 // Save watchlists to localStorage
 function saveWatchlists() {
-    localStorage.setItem('pulsequant_watchlists', JSON.stringify(watchlists));
+    const storageKey = getStorageKey();
+    localStorage.setItem(storageKey, JSON.stringify(watchlists));
 }
 
 // Render all watchlists
@@ -132,6 +205,13 @@ function viewWatchlist(id) {
 
 // Open create modal
 function openCreateModal() {
+    if (!currentUser) {
+        if (confirm('You need to create an account to save watchlists. Go to account page?')) {
+            window.location.href = 'account.html';
+        }
+        return;
+    }
+    
     currentEditId = null;
     document.getElementById('modalTitle').textContent = 'Create New Watchlist';
     document.getElementById('watchlistName').value = '';
@@ -141,6 +221,13 @@ function openCreateModal() {
 
 // Edit watchlist
 function editWatchlist(id) {
+    if (!currentUser) {
+        if (confirm('You need to create an account to edit watchlists. Go to account page?')) {
+            window.location.href = 'account.html';
+        }
+        return;
+    }
+    
     const watchlist = watchlists.find(w => w.id === id);
     if (!watchlist) return;
     
@@ -153,6 +240,13 @@ function editWatchlist(id) {
 
 // Delete watchlist
 function deleteWatchlist(id) {
+    if (!currentUser) {
+        if (confirm('You need to create an account to delete watchlists. Go to account page?')) {
+            window.location.href = 'account.html';
+        }
+        return;
+    }
+    
     if (confirm('Are you sure you want to delete this watchlist?')) {
         watchlists = watchlists.filter(w => w.id !== id);
         saveWatchlists();
@@ -222,7 +316,10 @@ function saveWatchlist() {
 }
 
 // Initialize
-document.addEventListener('DOMContentLoaded', loadWatchlists);
+document.addEventListener('DOMContentLoaded', function() {
+    checkLoginStatus();
+    loadWatchlists();
+});
 
 // Make functions global
 window.openCreateModal = openCreateModal;
@@ -232,3 +329,5 @@ window.handleFileUpload = handleFileUpload;
 window.viewWatchlist = viewWatchlist;
 window.editWatchlist = editWatchlist;
 window.deleteWatchlist = deleteWatchlist;
+window.toggleAccountDropdown = toggleAccountDropdown;
+window.logout = logout;
