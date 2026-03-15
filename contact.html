@@ -120,53 +120,47 @@
             border-color: rgba(0, 229, 255, 0.3);
         }
 
-        .btn-primary {
+        .account-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
             background: linear-gradient(135deg, #00E5FF, #7B5CFF);
-            color: #0A0A0F !important;
-            border: none;
-            padding: 0.6rem 1.5rem;
-            border-radius: 8px;
-            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
             transition: all 0.3s;
-            text-decoration: none;
+            border: 2px solid rgba(255, 255, 255, 0.2);
         }
 
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px -10px #00E5FF;
+        .account-circle:hover {
+            transform: scale(1.1);
+            border-color: #00E5FF;
+        }
+
+        .account-circle span {
+            color: #0A0A0F;
+            font-weight: 600;
+            font-size: 1.2rem;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 800px;
             margin: 3rem auto;
             padding: 0 2rem;
         }
 
         .page-header {
             text-align: center;
-            margin-bottom: 4rem;
+            margin-bottom: 3rem;
         }
 
         .page-header h1 {
-            font-size: 3rem;
+            font-size: 2.5rem;
             margin-bottom: 1rem;
             background: linear-gradient(135deg, #00E5FF, #7B5CFF, #C94BFF);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-        }
-
-        .page-header p {
-            color: #9AA0A6;
-            font-size: 1.2rem;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .content-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 3rem;
-            margin-bottom: 4rem;
         }
 
         .about-section {
@@ -176,141 +170,24 @@
             padding: 2.5rem;
             backdrop-filter: blur(10px);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            margin-bottom: 2rem;
         }
 
         .about-section h2 {
             font-size: 1.8rem;
             margin-bottom: 1.5rem;
-            color: #EAEAF0;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .about-section h2 span {
-            font-size: 2rem;
+            color: #00E5FF;
         }
 
         .about-section p {
             color: #9AA0A6;
             margin-bottom: 1.5rem;
             line-height: 1.8;
+            font-size: 1.1rem;
         }
 
-        .feature-list {
-            list-style: none;
-            margin-top: 2rem;
-        }
-
-        .feature-list li {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 0.8rem 0;
-            border-bottom: 1px solid rgba(0, 229, 255, 0.1);
-        }
-
-        .feature-list li:last-child {
-            border-bottom: none;
-        }
-
-        .feature-list li span {
-            color: #00E5FF;
-            font-weight: 600;
-            min-width: 30px;
-        }
-
-        .feature-list li strong {
-            color: #EAEAF0;
-            min-width: 120px;
-        }
-
-        .feature-list li small {
-            color: #9AA0A6;
-        }
-
-        .contact-section {
-            background: rgba(17, 17, 24, 0.7);
-            border: 1px solid rgba(0, 229, 255, 0.2);
-            border-radius: 24px;
-            padding: 2.5rem;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-        }
-
-        .contact-section h2 {
-            font-size: 1.8rem;
-            margin-bottom: 1.5rem;
-            color: #EAEAF0;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .contact-section h2 span {
-            font-size: 2rem;
-        }
-
-        .contact-card {
-            background: rgba(10, 10, 15, 0.5);
-            border: 1px solid rgba(0, 229, 255, 0.2);
-            border-radius: 16px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            transition: all 0.3s;
-        }
-
-        .contact-card:hover {
-            border-color: #00E5FF;
-            transform: translateY(-2px);
-        }
-
-        .contact-label {
-            color: #9AA0A6;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 0.5rem;
-        }
-
-        .contact-value {
-            font-size: 1.4rem;
-            font-weight: 600;
-            color: #00E5FF;
-            margin-bottom: 1rem;
-            word-break: break-all;
-        }
-
-        .contact-description {
-            color: #9AA0A6;
-            font-size: 0.95rem;
-        }
-
-        .contact-features {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
-            margin-top: 2rem;
-        }
-
-        .contact-feature {
-            background: rgba(0, 229, 255, 0.1);
-            border: 1px solid rgba(0, 229, 255, 0.2);
-            border-radius: 12px;
-            padding: 1rem;
-            text-align: center;
-        }
-
-        .contact-feature .number {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #00E5FF;
-            display: block;
-        }
-
-        .contact-feature .label {
-            color: #9AA0A6;
-            font-size: 0.85rem;
+        .about-section p:last-child {
+            margin-bottom: 0;
         }
 
         .how-it-works {
@@ -326,15 +203,12 @@
         .how-it-works h2 {
             font-size: 1.8rem;
             margin-bottom: 2rem;
-            color: #EAEAF0;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+            color: #00E5FF;
         }
 
         .steps-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 2rem;
         }
 
@@ -380,23 +254,33 @@
             text-align: center;
             border-top: 1px solid rgba(0, 229, 255, 0.2);
             color: #9AA0A6;
+            margin-top: 2rem;
+        }
+
+        .footer p {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer a {
+            color: #00E5FF;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
         }
 
         @media (max-width: 768px) {
-            .content-grid {
-                grid-template-columns: 1fr;
-            }
-            
             .page-header h1 {
-                font-size: 2.2rem;
-            }
-            
-            .contact-features {
-                grid-template-columns: 1fr;
+                font-size: 2rem;
             }
             
             .nav-links {
                 display: none;
+            }
+            
+            .steps-grid {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -413,121 +297,65 @@
                 <a href="index.html" class="nav-link">Home</a>
                 <a href="dashboard.html" class="nav-link">Dashboard</a>
                 <a href="contact.html" class="nav-link active">Contact</a>
-                <a href="dashboard.html" class="btn-primary">Launch App</a>
+            </div>
+            <div class="account-circle" onclick="window.location.href='account.html'">
+                <span>👤</span>
             </div>
         </div>
     </nav>
 
     <div class="container">
         <div class="page-header">
-            <h1>Get in Touch</h1>
-            <p>Have questions about PulseQuant? We're here to help.</p>
+            <h1>About PulseQuant</h1>
         </div>
 
-        <div class="content-grid">
-            <div class="about-section">
-                <h2>
-                    <span>📊</span>
-                    About PulseQuant
-                </h2>
-                <p>PulseQuant is a free, lightweight stock chart viewing platform built specifically for Indian traders and investors. No registration, no hidden costs — just clean, fast charts to help with your market analysis.</p>
-                
-                <p>Powered by TradingView charts and featuring a database of over 7,000 Indian stocks, PulseQuant gives you professional-grade tools right in your browser. All your watchlists are stored locally, so your data stays private.</p>
-
-                <ul class="feature-list">
-                    <li>
-                        <span>✓</span>
-                        <strong>7,000+</strong>
-                        <small>Indian stocks covered</small>
-                    </li>
-                    <li>
-                        <span>✓</span>
-                        <strong>25</strong>
-                        <small>Watchlists per user</small>
-                    </li>
-                    <li>
-                        <span>✓</span>
-                        <strong>500</strong>
-                        <small>Stocks per watchlist</small>
-                    </li>
-                    <li>
-                        <span>✓</span>
-                        <strong>CSV</strong>
-                        <small>Import/export support</small>
-                    </li>
-                    <li>
-                        <span>✓</span>
-                        <strong>Free</strong>
-                        <small>No registration needed</small>
-                    </li>
-                </ul>
-            </div>
-
-            <div class="contact-section">
-                <h2>
-                    <span>📧</span>
-                    Contact Us
-                </h2>
-                
-                <div class="contact-card">
-                    <div class="contact-label">Email</div>
-                    <div class="contact-value">h8501705@gmail.com</div>
-                    <div class="contact-description">Send us your questions, feedback, or suggestions. We typically respond within 24 hours.</div>
-                </div>
-
-                <div class="contact-features">
-                    <div class="contact-feature">
-                        <span class="number">24h</span>
-                        <span class="label">Response Time</span>
-                    </div>
-                    <div class="contact-feature">
-                        <span class="number">✓</span>
-                        <span class="label">Free Support</span>
-                    </div>
-                </div>
-            </div>
+        <div class="about-section">
+            <h2>What is PulseQuant?</h2>
+            <p>PulseQuant is a free, professional-grade stock charting platform built specifically for the Indian market. We provide clean, fast, and reliable charts powered by TradingView technology, allowing traders and investors to analyze over 7,000 Indian stocks without any registration or hidden costs.</p>
+            
+            <p>Our platform features multiple watchlist management, smart search with auto-complete, and quick navigation between stocks using Previous/Next buttons or keyboard shortcuts. We believe that powerful market analysis tools should be accessible to everyone, which is why we keep everything free and store your data locally in your browser for complete privacy.</p>
+            
+            <p>With PulseQuant, you get line charts by default for faster loading, with the option to switch to detailed candlestick patterns when you need deeper analysis. All charts show 1-year data by default, giving you the perfect balance of historical context and performance. Whether you're tracking the NIFTY 50, building sector-specific watchlists, or analyzing mid-cap stocks, PulseQuant gives you the tools you need to make informed trading decisions.</p>
         </div>
 
         <div class="how-it-works">
-            <h2>
-                <span>⚡</span>
-                How PulseQuant Works
-            </h2>
+            <h2>How PulseQuant Works</h2>
             
             <div class="steps-grid">
                 <div class="step-card">
                     <div class="step-number">1</div>
                     <h3>Create Watchlists</h3>
-                    <p>Build multiple watchlists with up to 500 stocks each. Import via CSV or search from our database.</p>
+                    <p>Build multiple watchlists with up to 500 stocks each. Import via CSV or search from our database of 7,000+ Indian stocks.</p>
                 </div>
                 
                 <div class="step-card">
                     <div class="step-number">2</div>
                     <h3>View Charts</h3>
-                    <p>Click any stock to open TradingView charts with 1-year default view. Switch between line and candlestick.</p>
+                    <p>Click any stock to open TradingView charts with 1-year default view. Switch between line and candlestick with one click.</p>
                 </div>
                 
                 <div class="step-card">
                     <div class="step-number">3</div>
                     <h3>Navigate Easily</h3>
-                    <p>Use Previous/Next buttons to move through your watchlist. Keyboard shortcuts supported.</p>
+                    <p>Use Previous/Next buttons to move through your watchlist. Keyboard shortcuts (← → arrows) are also supported.</p>
                 </div>
                 
                 <div class="step-card">
                     <div class="step-number">4</div>
                     <h3>Privacy First</h3>
-                    <p>Your watchlists stay in your browser. No accounts, no cloud storage, complete privacy.</p>
+                    <p>Your watchlists stay in your browser. No accounts, no cloud storage, complete privacy. Create a profile only if you want to save your data.</p>
                 </div>
             </div>
         </div>
 
-        <div style="text-align: center; margin: 3rem 0;">
+        <div style="text-align: center; margin: 2rem 0;">
             <p style="color: #9AA0A6;">Built for the Indian trading community. Free forever.</p>
         </div>
     </div>
 
     <footer class="footer">
-        <p>© 2024 PulseQuant. All rights reserved. | <a href="mailto:h8501705@gmail.com" style="color: #00E5FF; text-decoration: none;">h8501705@gmail.com</a></p>
+        <p>© 2024 PulseQuant. All rights reserved.</p>
+        <p>Contact us: <a href="mailto:h8501705@gmail.com">h8501705@gmail.com</a></p>
     </footer>
 </body>
 </html>
