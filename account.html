@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account - PulseQuant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0A0A0F;
+            color: #EAEAF0;
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        .bg-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(123, 92, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -2;
+        }
+
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .orb-1 {
+            width: 500px;
+            height: 500px;
+            background: rgba(0, 229, 255, 0.1);
+            top: -250px;
+            right: -100px;
+        }
+
+        .orb-2 {
+            width: 400px;
+            height: 400px;
+            background: rgba(123, 92, 255, 0.08);
+            bottom: -200px;
+            left: -100px;
+            animation-delay: -5s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-50px) scale(1.1); }
+        }
+
+        .navbar {
+            background: rgba(10, 10, 15, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 229, 255, 0.2);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #00E5FF, #7B5CFF, #C94BFF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: #9AA0A6;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover {
+            color: #EAEAF0;
+            background: rgba(0, 229, 255, 0.1);
+        }
+
+        .nav-link.active {
+            color: #00E5FF;
+            background: rgba(0, 229, 255, 0.1);
+        }
+
+        .account-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00E5FF, #7B5CFF);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .account-circle:hover {
+            transform: scale(1.1);
+            border-color: #00E5FF;
+        }
+
+        .account-circle span {
+            color: #0A0A0F;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 4rem auto;
+            padding: 0 2rem;
+        }
+
+        .account-card {
+            background: rgba(17, 17, 24, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .account-card h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #00E5FF, #7B5CFF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+        }
+
+        .account-card .subtitle {
+            color: #9AA0A6;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #EAEAF0;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(10, 10, 15, 0.8);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            border-radius: 12px;
+            color: #EAEAF0;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #00E5FF;
+        }
+
+        .form-group input::placeholder {
+            color: #9AA0A6;
+            opacity: 0.5;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #00E5FF, #7B5CFF);
+            border: none;
+            border-radius: 12px;
+            color: #0A0A0F;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 1rem;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -10px #00E5FF;
+        }
+
+        .btn-secondary {
+            width: 100%;
+            padding: 1rem;
+            background: transparent;
+            border: 1px solid rgba(123, 92, 255, 0.3);
+            border-radius: 12px;
+            color: #EAEAF0;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-secondary:hover {
+            border-color: #00E5FF;
+            background: rgba(0, 229, 255, 0.1);
+        }
+
+        .info-text {
+            text-align: center;
+            color: #9AA0A6;
+            font-size: 0.9rem;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(0, 229, 255, 0.2);
+        }
+
+        .info-text small {
+            display: block;
+            margin-top: 0.5rem;
+            color: #9AA0A6;
+            opacity: 0.7;
+        }
+
+        .footer {
+            padding: 2rem;
+            text-align: center;
+            border-top: 1px solid rgba(0, 229, 255, 0.2);
+            color: #9AA0A6;
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">PulseQuant</a>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="dashboard.html" class="nav-link">Dashboard</a>
+                <a href="contact.html" class="nav-link">Contact</a>
+            </div>
+            <div class="account-circle" onclick="window.location.href='account.html'">
+                <span>👤</span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="account-card">
+            <h1>Welcome to PulseQuant</h1>
+            <p class="subtitle">Create your account to save watchlists</p>
+
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" id="emailInput" placeholder="Enter your Gmail address" value="">
+            </div>
+
+            <button class="btn-primary" onclick="createAccount()">Create Account</button>
+            <a href="dashboard.html" class="btn-secondary">Continue without account</a>
+
+            <div class="info-text">
+                <p>🔒 No password needed • Data stored locally in your browser</p>
+                <small>Your watchlists will be saved under this email. Use the same email next time to access your data.</small>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>© 2024 PulseQuant. All rights reserved.</p>
+    </footer>
+
+    <script>
+        function createAccount() {
+            const email = document.getElementById('emailInput').value.trim();
+            
+            if (!email) {
+                alert('Please enter your Gmail address');
+                return;
+            }
+            
+            if (!email.includes('@') || !email.includes('.')) {
+                alert('Please enter a valid email address');
+                return;
+            }
+            
+            // Store user in localStorage
+            const user = {
+                email: email,
+                createdAt: new Date().toISOString()
+            };
+            
+            localStorage.setItem('pulsequant_current_user', JSON.stringify(user));
+            
+            // Check if this user already has watchlists
+            const storageKey = `pulsequant_watchlists_${email}`;
+            const existingWatchlists = localStorage.getItem(storageKey);
+            
+            if (!existingWatchlists) {
+                // Copy default watchlists to user's storage
+                const defaultWatchlists = [
+                    {
+                        id: '1',
+                        name: 'NIFTY 50',
+                        stocks: ['RELIANCE', 'TCS', 'HDFCBANK', 'INFY', 'ICICIBANK', 'SBIN', 'BHARTIARTL', 'ITC', 'KOTAKBANK', 'LT'],
+                        isDefault: true,
+                        createdAt: new Date().toISOString()
+                    },
+                    {
+                        id: '2',
+                        name: 'Banking',
+                        stocks: ['HDFCBANK', 'ICICIBANK', 'SBIN', 'KOTAKBANK', 'AXISBANK', 'INDUSINDBK', 'BANDHANBNK', 'FEDERALBNK', 'PNB', 'BANKBARODA'],
+                        isDefault: false,
+                        createdAt: new Date().toISOString()
+                    },
+                    {
+                        id: '3',
+                        name: 'IT',
+                        stocks: ['TCS', 'INFY', 'WIPRO', 'HCLTECH', 'TECHM', 'LTTS', 'MPHASIS', 'MINDTREE', 'COFORGE', 'PERSISTENT'],
+                        isDefault: false,
+                        createdAt: new Date().toISOString()
+                    },
+                    {
+                        id: '4',
+                        name: 'Pharma',
+                        stocks: ['SUNPHARMA', 'DRREDDY', 'CIPLA', 'DIVISLAB', 'BIOCON', 'LUPIN', 'ALKEM', 'TORNTPHARM', 'AUROPHARMA', 'GLENMARK'],
+                        isDefault: false,
+                        createdAt: new Date().toISOString()
+                    },
+                    {
+                        id: '5',
+                        name: 'Auto',
+                        stocks: ['TATAMOTORS', 'MARUTI', 'M&M', 'BAJAJ-AUTO', 'EICHERMOT', 'HEROMOTOCO', 'ASHOKLEY', 'TVSMOTOR', 'TATAMOTORS', 'BALKRISIND'],
+                        isDefault: false,
+                        createdAt: new Date().toISOString()
+                    }
+                ];
+                localStorage.setItem(storageKey, JSON.stringify(defaultWatchlists));
+            }
+            
+            alert('Account created successfully!');
+            window.location.href = 'dashboard.html';
+        }
+    </script>
+</body>
+</html>
