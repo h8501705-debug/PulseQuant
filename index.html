@@ -132,19 +132,29 @@
             border-color: rgba(0, 229, 255, 0.3);
         }
 
-        .btn-primary {
+        /* Account Circle */
+        .account-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
             background: linear-gradient(135deg, #00E5FF, #7B5CFF);
-            color: #0A0A0F !important;
-            border: none;
-            padding: 0.6rem 1.5rem;
-            border-radius: 8px;
-            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
             transition: all 0.3s;
+            border: 2px solid rgba(255, 255, 255, 0.2);
         }
 
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px -10px #00E5FF;
+        .account-circle:hover {
+            transform: scale(1.1);
+            border-color: #00E5FF;
+        }
+
+        .account-circle span {
+            color: #0A0A0F;
+            font-weight: 600;
+            font-size: 1.2rem;
         }
 
         /* Hero Section */
@@ -207,87 +217,26 @@
             margin-right: auto;
         }
 
-        /* Features Section */
-        .features {
-            padding: 5rem 2rem;
-            background: rgba(17, 17, 24, 0.5);
-            backdrop-filter: blur(10px);
-            border-top: 1px solid rgba(0, 229, 255, 0.2);
-            border-bottom: 1px solid rgba(123, 92, 255, 0.2);
-        }
-
-        .features-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-        }
-
-        .feature-card {
-            background: rgba(17, 17, 24, 0.7);
-            border: 1px solid rgba(0, 229, 255, 0.2);
-            border-radius: 16px;
-            padding: 2rem;
-            transition: all 0.3s;
-            backdrop-filter: blur(5px);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-        }
-
-        .feature-card:hover {
-            transform: translateY(-5px);
-            border-color: #00E5FF;
-            box-shadow: 0 20px 30px -15px rgba(0, 229, 255, 0.3);
-        }
-
-        .feature-icon {
-            font-size: 2.5rem;
-            margin-bottom: 1.5rem;
-            display: inline-block;
-            padding: 1rem;
-            background: rgba(123, 92, 255, 0.1);
-            border-radius: 12px;
-            color: #00E5FF;
-        }
-
-        .feature-card h3 {
-            font-size: 1.3rem;
-            margin-bottom: 1rem;
-            color: #EAEAF0;
-        }
-
-        .feature-card p {
-            color: #9AA0A6;
-            line-height: 1.6;
-        }
-
-        /* CTA Section */
-        .cta-section {
-            padding: 5rem 2rem;
-            text-align: center;
-        }
-
-        .cta-container {
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .cta-container h2 {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            color: #EAEAF0;
-        }
-
-        .cta-container p {
-            color: #9AA0A6;
-            margin-bottom: 2rem;
-            font-size: 1.1rem;
-        }
-
         .cta-buttons {
             display: flex;
             gap: 1rem;
             justify-content: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00E5FF, #7B5CFF);
+            color: #0A0A0F !important;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -10px #00E5FF;
         }
 
         .btn-secondary {
@@ -349,7 +298,9 @@
                 <a href="index.html" class="nav-link active">Home</a>
                 <a href="dashboard.html" class="nav-link">Dashboard</a>
                 <a href="contact.html" class="nav-link">Contact</a>
-                <a href="dashboard.html" class="btn-primary">Launch App</a>
+            </div>
+            <div class="account-circle" onclick="window.location.href='account.html'">
+                <span>👤</span>
             </div>
         </div>
     </nav>
@@ -364,56 +315,9 @@
             <h1>Stock Charts Made Simple</h1>
             <p>Professional-grade charts, multiple watchlists, and real-time data for Indian markets. No registration, no hidden costs.</p>
             
-            <div class="cta-buttons" style="margin-top: 2rem;">
+            <div class="cta-buttons">
                 <a href="dashboard.html" class="btn-primary">Start Charting</a>
                 <a href="contact.html" class="btn-secondary">Learn More</a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Features Section -->
-    <section class="features">
-        <div class="features-container">
-            <div class="feature-card">
-                <div class="feature-icon">📊</div>
-                <h3>TradingView Charts</h3>
-                <p>Professional candlestick and line charts with 1-year default view. Switch between chart types with one click.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">📋</div>
-                <h3>Multiple Watchlists</h3>
-                <p>Create up to 25 watchlists with 500+ stocks each. Import via CSV or add manually with smart search.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">🔍</div>
-                <h3>Smart Search</h3>
-                <p>Search from 7,000+ Indian stocks with auto-complete. Get real-time suggestions as you type.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">🔄</div>
-                <h3>Quick Navigation</h3>
-                <p>Previous/Next buttons and keyboard shortcuts to move through your watchlist effortlessly.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">📈</div>
-                <h3>Line Chart Default</h3>
-                <p>Line charts by default for faster loading. Switch to candlestick when you need detailed analysis.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">🔒</div>
-                <h3>Privacy First</h3>
-                <p>All watchlists stored in your browser. No accounts, no tracking, complete privacy.</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- CTA Section -->
-    <section class="cta-section">
-        <div class="cta-container">
-            <h2>Ready to start charting?</h2>
-            <p>Join thousands of traders using PulseQuant for daily market analysis. No registration, completely free.</p>
-            <div class="cta-buttons">
-                <a href="dashboard.html" class="btn-primary">Launch Dashboard</a>
             </div>
         </div>
     </section>
